@@ -17,7 +17,7 @@ Communication is handled reactively using SmallRye Reactive Messaging.
 
 ## 🧱 Architecture
 
-```mermaid
+```Code
 [HTTP POST /messages] → MsgResource → MsgProducer → AMQP Queue → MsgConsumer
 ```
 - Messages are sent to the `words` address via `words-out`
