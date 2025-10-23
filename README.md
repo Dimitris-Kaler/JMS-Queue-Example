@@ -1,67 +1,84 @@
-# jms-client
+# JMS Queue Example with Quarkus & ActiveMQ Artemis
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This project demonstrates a simple messaging system using **Quarkus**, **SmallRye Reactive Messaging**, and **ActiveMQ Artemis** over **AMQP**.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## 📦 Overview
 
-## Running the application in dev mode
+The application consists of:
 
-You can run your application in dev mode that enables live coding using:
+- **MsgProducer**: Sends messages to an AMQP queue (`words-out`)
+- **MsgConsumer**: Receives messages from the queue (`words-in`)
+- **MsgResource**: Exposes a REST endpoint to send messages via HTTP POST
 
-```shell script
-./gradlew quarkusDev
+Communication is handled reactively using SmallRye Reactive Messaging.
+
+
+----
+
+## 🧱 Architecture
+
+```mermaid
+[HTTP POST /messages] → MsgResource → MsgProducer → AMQP Queue → MsgConsumer
 ```
+- Messages are sent to the `words` address via `words-out`
+- Messages are received from the same address via `words-in`
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
 
-## Packaging and running the application
+---
 
-The application can be packaged using:
+## ⚙️ Technologies Used
 
-```shell script
-./gradlew build
-```
+- [Quarkus](https://quarkus.io/)
+- [SmallRye Reactive Messaging](https://smallrye.io/smallrye-reactive-messaging/)
+- [ActiveMQ Artemis](https://activemq.apache.org/components/artemis/)
+- Jakarta REST, CDI
+- Docker & Docker Compose
+---
 
-It produces the `quarkus-run.jar` file in the `build/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
 
-The application is now runnable using `java -jar build/quarkus-app/quarkus-run.jar`.
+
 
 If you want to build an _über-jar_, execute the following command:
 
 ```shell script
 ./gradlew build -Dquarkus.package.jar.type=uber-jar
 ```
+## 🚀 How to Run
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./gradlew build -Dquarkus.native.enabled=true
+### 1. Build the Quarkus application
+```bash
+./gradlew build
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+### 2. Start with Docker Compose
 
-```shell script
-./gradlew build -Dquarkus.native.enabled=true -Dquarkus.native.container-build=true
+```bash
+docker-compose up --build
+```
+This will start:
+
+- ActiveMQ Artemis broker
+
+- Quarkus JMS client on port 9999
+
+
+## 📬 API Usage
+
+### Send Message
+
+```bash 
+curl -X POST http://localhost:9999/messages \
+     -H "Content-Type: text/plain" \
+     -d "Hello from Quarkus!"
+
 ```
 
-You can then execute your native executable with: `./build/jms-client-1.0.0-SNAPSHOT-runner`
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/gradle-tooling>.
+### Expected Output
+- The message is sent to the AMQP queue
 
-## Related Guides
+- The consumer logs the received message:
 
-- Messaging - AMQP Connector ([guide](https://quarkus.io/guides/amqp)): Connect to AMQP with Reactive Messaging
-
-## Provided Code
-
-### Messaging codestart
-
-Use Quarkus Messaging
-
-[Related Apache AMQP 1.0 guide section...](https://quarkus.io/guides/amqp)
-
+```Code
+📥 Received: Hello from Quarkus!
+```
