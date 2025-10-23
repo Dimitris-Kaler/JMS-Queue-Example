@@ -1,0 +1,31 @@
+###
+# Dockerfile.dev για Quarkus σε Dev Mode
+###
+
+# Βασικό image με OpenJDK 17
+FROM registry.access.redhat.com/ubi9/openjdk-17:1.21
+
+# Ορισμός γλώσσας
+ENV LANGUAGE='en_US:en'
+
+# Δημιουργία φακέλου για το project μέσα στο container
+WORKDIR /jms-client
+
+# Αντιγραφή του source code μέσα στο container
+# Σημαντικό: paths σχετίζονται με το build context (./jms-client)
+COPY src /jms-client/src
+COPY build.gradle /jms-client/build.gradle   # αν χρησιμοποιείς Gradle
+# Αν έχεις settings.gradle ή άλλα αρχεία, πρόσθεσέ τα κι αυτά
+COPY gradlew /jms-client/gradlew
+COPY gradle /jms-client/gradle
+
+# Ανοιγμα του port για dev mode
+EXPOSE 9999
+
+# Ορισμός dev mode
+ENV QUARKUS_PROFILE=dev
+ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Dquarkus.http.port=9999 -Dquarkus.profile=dev -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+
+# Εκκίνηση Quarkus σε dev mode με Gradle
+ENTRYPOINT ["./gradlew", "quarkusDev"]
+
