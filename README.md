@@ -57,7 +57,7 @@ docker-compose up --build
 ```
 This will start:
 
-- ActiveMQ Artemis broker
+- ActiveMQ Artemis broker on port 8161
 
 - Quarkus JMS client on port 9999
 
